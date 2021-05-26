@@ -1,0 +1,14 @@
+{
+  "name": "Token",
+  "prefix": "secretManager",
+  "description": "The following example uses the us-west-2 region and prefixes all secrets with `staging`.",
+  "config": {
+    "aws.region": "us-west-2",
+    "secret.prefix": "staging"
+  },
+  "connectorConfig": {
+    "username": "${secretManager:secret/test/some/connector:username}",
+    "password": "${secretManager:secret/test/some/connector:password}"
+  },
+  "tip": "Some of the settings of this config provider can be configured via environment variables."
+}
