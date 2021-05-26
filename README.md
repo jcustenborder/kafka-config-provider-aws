@@ -25,7 +25,7 @@ to run the plugin.
 2. Copy all of the dependencies under the newly created subdirectory.
 3. Restart the Connect worker.
 
-# Converters
+# Config Providers
 ## [SecretsManagerConfigProvider](https://jcustenborder.github.io/kafka-connect-documentation/projects/kafka-config-provider-aws/configProviders/SecretsManagerConfigProvider.html)
 
 ```
