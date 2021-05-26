@@ -39,7 +39,8 @@ class SecretsManagerConfigProviderConfig extends AbstractConfig {
 
   public static final String AWS_ACCESS_KEY_ID_CONFIG = "aws.access.key";
   public static final String AWS_ACCESS_KEY_ID_DOC = "AWS access key ID to connect with. If this value is not " +
-      "set the DefaultAWSCredentialsProviderChain will be used to attempt loading the credentials.";
+      "set the `DefaultAWSCredentialsProviderChain <https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/auth/DefaultAWSCredentialsProviderChain.html>`_ " +
+      "will be used to attempt loading the credentials from several default locations.";
   public static final String AWS_SECRET_KEY_CONFIG = "aws.secret.key";
   public static final String AWS_SECRET_KEY_DOC = "AWS secret access key to connect with.";
 
