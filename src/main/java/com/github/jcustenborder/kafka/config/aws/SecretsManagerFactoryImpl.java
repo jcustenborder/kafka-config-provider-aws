@@ -26,14 +26,15 @@ class SecretsManagerFactoryImpl implements SecretsManagerFactory {
     AWSSecretsManagerClientBuilder builder = AWSSecretsManagerClientBuilder.standard();
 
     if (null != config.region && !config.region.isEmpty()) {
-      builder = builder.withRegion(config.region);
-    }
-    if (null != config.credentials) {
-      builder = builder.withCredentials(new AWSStaticCredentialsProvider(config.credentials));
+      if (null != config.endpointUrl) {
+        builder = builder.withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(config.endpointUrl, config.region));
+      } else {
+        builder = builder.withRegion(config.region);
+      }
     }
 
-    if (null != config.endpointUrl) {
-      builder = builder.withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(config.endpointUrl, null));
+    if (null != config.credentials) {
+      builder = builder.withCredentials(new AWSStaticCredentialsProvider(config.credentials));
     }
 
     return builder.build();

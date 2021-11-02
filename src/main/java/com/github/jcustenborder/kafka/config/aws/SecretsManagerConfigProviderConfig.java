@@ -45,7 +45,7 @@ class SecretsManagerConfigProviderConfig extends AbstractConfig {
   public static final String AWS_SECRET_KEY_DOC = "AWS secret access key to connect with.";
 
   public static final String AWS_ENDPOINT_URL_CONFIG = "aws.endpoint.url";
-  public static final String AWS_ENDPOINT_URL_DOC = "Endpoint at which to hit aws. Most useful for localstack. Ex: localhost:4566";
+  public static final String AWS_ENDPOINT_URL_DOC = "Endpoint at which to hit aws. Most useful for localstack. To use this config, aws.region MUST also be provided. Ex: http://localhost:4566";
 
   public final String region;
   public final long minimumSecretTTL;
