@@ -16,6 +16,7 @@
 package com.github.jcustenborder.kafka.config.aws;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.secretsmanager.AWSSecretsManager;
 import com.amazonaws.services.secretsmanager.AWSSecretsManagerClientBuilder;
 
@@ -29,6 +30,10 @@ class SecretsManagerFactoryImpl implements SecretsManagerFactory {
     }
     if (null != config.credentials) {
       builder = builder.withCredentials(new AWSStaticCredentialsProvider(config.credentials));
+    }
+
+    if (null != config.endpointUrl) {
+      builder = builder.withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(config.endpointUrl, null));
     }
 
     return builder.build();

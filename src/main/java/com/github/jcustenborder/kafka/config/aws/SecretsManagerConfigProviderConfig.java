@@ -44,10 +44,14 @@ class SecretsManagerConfigProviderConfig extends AbstractConfig {
   public static final String AWS_SECRET_KEY_CONFIG = "aws.secret.key";
   public static final String AWS_SECRET_KEY_DOC = "AWS secret access key to connect with.";
 
+  public static final String AWS_ENDPOINT_URL_CONFIG = "aws.endpoint.url";
+  public static final String AWS_ENDPOINT_URL_DOC = "Endpoint at which to hit aws. Most useful for localstack. Ex: localhost:4566";
+
   public final String region;
   public final long minimumSecretTTL;
   public final AWSCredentials credentials;
   public final String prefix;
+  public final String endpointUrl;
 
   public SecretsManagerConfigProviderConfig(Map<String, ?> settings) {
     super(config(), settings);
@@ -63,6 +67,7 @@ class SecretsManagerConfigProviderConfig extends AbstractConfig {
       credentials = null;
     }
     prefix = getString(PREFIX_CONFIG);
+    endpointUrl = getString(AWS_ENDPOINT_URL_CONFIG);
   }
 
   public static ConfigDef config() {
@@ -98,6 +103,12 @@ class SecretsManagerConfigProviderConfig extends AbstractConfig {
                 .importance(ConfigDef.Importance.LOW)
                 .defaultValue(Duration.ofMinutes(5L).toMillis())
                 .validator(ConfigDef.Range.atLeast(1000L))
+                .build()
+        ).define(
+            ConfigKeyBuilder.of(AWS_ENDPOINT_URL_CONFIG, ConfigDef.Type.STRING)
+                .documentation(AWS_ENDPOINT_URL_DOC)
+                .importance(ConfigDef.Importance.LOW)
+                .defaultValue(null)
                 .build()
         );
   }
