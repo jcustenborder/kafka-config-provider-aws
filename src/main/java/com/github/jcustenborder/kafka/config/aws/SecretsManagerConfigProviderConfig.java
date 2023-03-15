@@ -16,7 +16,12 @@
 package com.github.jcustenborder.kafka.config.aws;
 
 import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+import com.amazonaws.auth.STSAssumeRoleSessionCredentialsProvider;
+import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder;
 import com.github.jcustenborder.kafka.connect.utils.config.ConfigKeyBuilder;
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.common.config.ConfigDef;
@@ -44,9 +49,15 @@ class SecretsManagerConfigProviderConfig extends AbstractConfig {
   public static final String AWS_SECRET_KEY_CONFIG = "aws.secret.key";
   public static final String AWS_SECRET_KEY_DOC = "AWS secret access key to connect with.";
 
+  public static final String AWS_STS_ROLE_ARN_CONFIG = "aws.sts.role.arn";
+  public static final String AWS_STS_ROLE_ARN_DOC = "AWS Role ARN that is going to be assumed to retrieve the AWS secret.";
+  public static final String AWS_STS_SESSION_NAME_CONFIG = "aws.sts.session.name";
+  public static final String AWS_STS_SESSION_NAME_DOC = "AWS Session Name that is going to be used by the role assumption" +
+          " to retrieve the AWS secret.";
+
   public final String region;
   public final long minimumSecretTTL;
-  public final AWSCredentials credentials;
+  public final AWSCredentialsProvider credentialsProvider;
   public final String prefix;
 
   public SecretsManagerConfigProviderConfig(Map<String, ?> settings) {
@@ -57,10 +68,18 @@ class SecretsManagerConfigProviderConfig extends AbstractConfig {
     String awsAccessKeyId = getString(AWS_ACCESS_KEY_ID_CONFIG);
     String awsSecretKey = getPassword(AWS_SECRET_KEY_CONFIG).value();
 
+    String awsStsRoleArn = getString(AWS_STS_ROLE_ARN_CONFIG);
+    String awsStsSessionName = getString(AWS_STS_SESSION_NAME_CONFIG);
+
     if (null != awsAccessKeyId && !awsAccessKeyId.isEmpty()) {
-      credentials = new BasicAWSCredentials(awsAccessKeyId, awsSecretKey);
+      AWSCredentials credentials = new BasicAWSCredentials(awsAccessKeyId, awsSecretKey);
+      credentialsProvider = new AWSStaticCredentialsProvider(credentials);
+    } else if (null != awsStsRoleArn && !awsStsRoleArn.isEmpty()) {
+      credentialsProvider = new STSAssumeRoleSessionCredentialsProvider.Builder(awsStsRoleArn, awsStsSessionName)
+          .withStsClient(AWSSecurityTokenServiceClientBuilder.standard().withCredentials(new DefaultAWSCredentialsProviderChain()).build())
+          .build();
     } else {
-      credentials = null;
+      credentialsProvider = null;
     }
     prefix = getString(PREFIX_CONFIG);
   }
@@ -70,6 +89,18 @@ class SecretsManagerConfigProviderConfig extends AbstractConfig {
         .define(
             ConfigKeyBuilder.of(REGION_CONFIG, ConfigDef.Type.STRING)
                 .documentation(REGION_DOC)
+                .importance(ConfigDef.Importance.HIGH)
+                .defaultValue("")
+                .build()
+        ).define(
+            ConfigKeyBuilder.of(AWS_STS_ROLE_ARN_CONFIG, ConfigDef.Type.STRING)
+                .documentation(AWS_STS_ROLE_ARN_DOC)
+                .importance(ConfigDef.Importance.HIGH)
+                .defaultValue("")
+                .build()
+        ).define(
+            ConfigKeyBuilder.of(AWS_STS_SESSION_NAME_CONFIG, ConfigDef.Type.STRING)
+                .documentation(AWS_STS_SESSION_NAME_DOC)
                 .importance(ConfigDef.Importance.HIGH)
                 .defaultValue("")
                 .build()
